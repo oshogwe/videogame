@@ -1,25 +1,33 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import './App.css';
-import useSWR from 'swr';
 
-const fetcher=(...args)=>fetch(...args).then((reponse)=>reponse.json());
+
+
 
 function App() {
   const [gameTitle, setGameTitle] = useState('');
   const [searchedGames, setSearchedGames] = useState([]);
+  const[gameDeals, setGameDeals] = useState([]);
+  
  
-  
-  
-  const {data}=useSWR(
-    `https://www.cheapshark.com/api/1.0/deals?storeID=1&upperPrice=20&pageSize=3`, fetcher);
-
   const searchGame=()=>{
     fetch(`https://www.cheapshark.com/api/1.0/games?title=${gameTitle}&limit=3`)
     .then((response)=>response.json())
     .then((data)=>{
       setSearchedGames(data);
+      console.log(data);
     });
   };
+
+  useEffect(()=>{
+    fetch(`https://www.cheapshark.com/api/1.0/deals?storeID=1&upperPrice=20&pageSize=3`)
+    .then((response)=>response.json())
+    .then((data)=>{
+      setGameDeals(data);
+      console.log(data);
+   });
+   }, []);
+  
 
    return (
     <div className="App">
@@ -48,8 +56,7 @@ function App() {
       <div className='dealsSection'>
         <h1>Latest deals</h1>
          <div className='games'>
-          {data &&
-            data.map((game, key)=>{
+          {gameDeals.map((game, key)=>{
               return(
                 <div className='game' id='deals' key={key}>
                   <h3>{game.title}</h3>
